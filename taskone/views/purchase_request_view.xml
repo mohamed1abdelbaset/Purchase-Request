@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_purchase_request_tree" model="ir.ui.view">
+        <field name="name">purchase.request.tree</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="request_name"/>
+                <field name="requested_by"/>
+                <field name="start_date"/>
+                <field name="total_price"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_purchase_request_form" model="ir.ui.view">
+        <field name="name">purchase.request.form</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button id="submit_approval_button" name="action_submit_approval" string="Submit for Approval"
+                            states="draft" class="btn-primary" type="object"/>
+                    <button id="cancel_button" name="action_cancel" string="Cancel" states="draft"
+                            type="object"/>
+
+                    <button id="approve_button" name="action_approve" string="Approve" states="submit_for_approval"
+                            type="object"/>
+
+                    <button id="reject_button" string="Reject" states="submit_for_approval,action_approve"
+                            name="%(taskone.rejection_reason_action)d" type="action"/>
+
+                    <button id="Reset_to_draft_button" name="action_reset" string="Reset to Draft" states="cancel"
+                            type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approve,cancel,reset"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="request_name"
+                                   attrs="{'readonly': [('state', 'in', ('approve', 'reject', 'cancel'))]}"/>
+                            <field name="requested_by"
+                                   attrs="{'readonly': [('state', 'in', ('approve', 'reject', 'cancel'))]}"/>
+                            <field name="start_date"
+                                   attrs="{'readonly': [('state', 'in', ('approve', 'reject', 'cancel'))]}"/>
+                        </group>
+                        <group>
+                            <field name="total_price"/>
+                            <field name="rejection_reason" attrs="{'invisible': [('state', '!=', 'reject')]}"/>
+                            <!--<field name="state"/>-->
+                        </group>
+                    </group>
+                    <group>
+                        <field name="orderlines">
+                            <tree editable="bottom">
+                                <field name="product_id"/>
+                                <field name="description"/>
+                                <field name="quantity"/>
+                                <field name="cost_price"/>
+                                <field name="total"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_purchase_request" model="ir.actions.act_window">
+        <field name="name">Purchases</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new purchase Request!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_purchase_root"
+              name="Purchase request"
+              sequence="10"/>
+
+    <menuitem id="menu_purchase_request_root"
+              name="Purchase Requests"
+              action="action_purchase_request"
+              parent="menu_purchase_root"
+              sequence="10"/>
+
+</odoo>
